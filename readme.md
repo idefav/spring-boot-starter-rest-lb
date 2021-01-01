@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/idefav/spring-boot-starter-rest-lb.svg?branch=master)](https://travis-ci.com/idefav/spring-boot-starter-rest-lb)
+[![Build Status](https://travis-ci.org/idefav/spring-boot-starter-rest-lb.svg?branch=master)](https://travis-ci.org/idefav/spring-boot-starter-rest-lb)
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/22379/badge.svg)](https://scan.coverity.com/projects/idefav-spring-boot-starter-rest-lb)
 [![GitHub release](https://img.shields.io/github/release/idefav/spring-boot-starter-rest-lb.svg)](https://github.com/idefav/spring-boot-starter-rest-lb/releases)
 [![Maven Central Repo](https://img.shields.io/maven-central/v/com.idefav.rest.lb/spring-boot-starter-rest-lb.svg)](https://mvnrepository.com/artifact/com.idefav.rest.lb/spring-boot-starter-rest-lb)

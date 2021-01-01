@@ -18,8 +18,10 @@ branches:
 
 env:
   global:
-    - secure: "iKl6dYhzDRYC1KEhr6X_1Q"
+    - secure: "q07eWMjabOHONb7Q/oF0KUvMXw5PcWc71rrcrxkCzBYyXyVAOr0f49Dy1weNQIKLnkMRbvo9iXms7Y7CRbEO8BwBUnRo3iKD3lWAuHavBLMGK5/3IYd4YbmoJ9aDrj5dxrUtuw+RupLrQ9vBlMOKa8VMaHAw5PyUjo5O+3PNSduqoJUNI7hirLQEuCIQpHEZhbcjITpH0u53QcQ7wAwkmG5DJDHGET1ZIfXiShON/QWuH+vBy4bfKGva3DzAP94X9p+zdJm7ReX1YMTbq4HSEfxgoHPpicnjRBVt6JBzXeXrRvcg3ZlDhnP4yjSRYNeU+e/Jo1mwGoUch669BrdlSSl16H52TZefxKqGYGG6ZBq5yAzEW8qgTjtd/8OqaXbJIdAjPrb99XEEsf12oPiEuDQzJl7Bls2BVekHnzQJHLHp8c6l8lIKkVMWuBPyNqQKChw+CGYkl1nyBINoMbg3P7NoQTMHRB2ptaNSkqjURu3qf/qViWLtdMFPoTdWFyfSY2z6FMWkKGK+hVhPjRfGGyV1IxZos3vQrx5U6eE7WOQLvw4rYGBe/VBN73n5BZZWvv/7WNuck/ZBJUY9kC8r+/7IlCZDV0tQZ9bp4+kCL5XBQUSqipT7MM6JGoWMvNR1jqpzzHHot4I7NIa/VwyHy2YqYWhkq3tp3Ct3V3UrOpo="
     - "MAVEN_OPTS=-Xms1024m -Xmx3072m -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=384m"
+before_install:
+  - echo -n | openssl s_client -connect https://scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
 
 addons:
   coverity_scan:

@@ -29,11 +29,23 @@ public class RestLbAutoConfiguration {
     @Autowired(required = false)
     private List<RestTemplate> restTemplates = Collections.emptyList();
 
+    /**
+     * Load balancer interceptor load balancer interceptor.
+     *
+     * @param serverListProperty the server list property
+     * @return the load balancer interceptor
+     */
     @Bean
     public LoadBalancerInterceptor loadBalancerInterceptor(ServerListProperty serverListProperty) {
         return new LoadBalancerInterceptor(serverListProperty.getServiceList());
     }
 
+    /**
+     * Load balanced rest template initializer deprecated smart initializing singleton.
+     *
+     * @param restTemplateCustomizers the rest template customizers
+     * @return the smart initializing singleton
+     */
     @Bean
     public SmartInitializingSingleton loadBalancedRestTemplateInitializerDeprecated(
             final ObjectProvider<List<RestTemplateCustomizer>> restTemplateCustomizers) {
@@ -46,6 +58,12 @@ public class RestLbAutoConfiguration {
         });
     }
 
+    /**
+     * Rest template customizer rest template customizer.
+     *
+     * @param loadBalancerInterceptor the load balancer interceptor
+     * @return the rest template customizer
+     */
     @Bean
     @ConditionalOnMissingBean
     public RestTemplateCustomizer restTemplateCustomizer(

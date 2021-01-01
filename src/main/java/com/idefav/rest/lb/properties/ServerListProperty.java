@@ -10,39 +10,72 @@ import java.util.Map;
 /**
  * the ServerListProperty description.
  *
- * @author ${USER}
+ * @author wuzishu
  */
 @ConfigurationProperties(prefix = "idefav")
 public class ServerListProperty {
 
     private Map<String, ServiceConfig> serviceList = new HashMap<>();
 
+    /**
+     * Gets service list.
+     *
+     * @return the service list
+     */
     public Map<String, ServiceConfig> getServiceList() {
         return serviceList;
     }
 
+    /**
+     * Sets service list.
+     *
+     * @param serviceList the service list
+     */
     public void setServiceList(Map<String, ServiceConfig> serviceList) {
         this.serviceList = serviceList;
     }
 
 
+    /**
+     * The type Service config 2.
+     */
     static class ServiceConfig2 {
         private List<String> serverList;
         private Class<?> loadBancor = RandomLoadBalaner.class;
 
-         public List<String> getServerList() {
+        /**
+         * Gets server list.
+         *
+         * @return the server list
+         */
+        public List<String> getServerList() {
              return serverList;
          }
 
-         public void setServerList(List<String> serverList) {
+        /**
+         * Sets server list.
+         *
+         * @param serverList the server list
+         */
+        public void setServerList(List<String> serverList) {
              this.serverList = serverList;
          }
 
-         public Class<?> getLoadBancor() {
+        /**
+         * Gets load bancor.
+         *
+         * @return the load bancor
+         */
+        public Class<?> getLoadBancor() {
              return loadBancor;
          }
 
-         public void setLoadBancor(Class<?> loadBancor) {
+        /**
+         * Sets load bancor.
+         *
+         * @param loadBancor the load bancor
+         */
+        public void setLoadBancor(Class<?> loadBancor) {
              this.loadBancor = loadBancor;
          }
      }

@@ -14,6 +14,11 @@ import java.util.Random;
 public class RandomLoadBalaner extends AbstractLoadBalancer {
     private final Random random = new Random();
 
+    /**
+     * Instantiates a new Random load balaner.
+     *
+     * @param serverList the server list
+     */
     public RandomLoadBalaner(List<LbServer> serverList) {
         super(serverList);
     }

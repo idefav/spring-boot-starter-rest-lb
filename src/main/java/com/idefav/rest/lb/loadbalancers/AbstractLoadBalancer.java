@@ -11,12 +11,22 @@ import java.util.List;
  */
 public abstract class AbstractLoadBalancer implements LoadBalancer {
 
+    /**
+     * Instantiates a new Abstract load balancer.
+     *
+     * @param serverList the server list
+     */
     public AbstractLoadBalancer(List<LbServer> serverList) {
         this.serverList = serverList;
     }
 
     private List<LbServer> serverList;
 
+    /**
+     * Gets server list.
+     *
+     * @return the server list
+     */
     public List<LbServer> getServerList() {
         return serverList;
     }
@@ -24,7 +34,7 @@ public abstract class AbstractLoadBalancer implements LoadBalancer {
     /**
      * check server node list
      *
-     * @return boolean
+     * @return boolean boolean
      */
     protected boolean checkServerList() {
         if (serverList == null || serverList.size() <= 0) {

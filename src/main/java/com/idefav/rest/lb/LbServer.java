@@ -19,18 +19,38 @@ public class LbServer {
      */
     private Map<String, String> properties;
 
+    /**
+     * Gets url.
+     *
+     * @return the url
+     */
     public String getUrl() {
         return url;
     }
 
+    /**
+     * Sets url.
+     *
+     * @param url the url
+     */
     public void setUrl(String url) {
         this.url = url;
     }
 
+    /**
+     * Gets properties.
+     *
+     * @return the properties
+     */
     public Map<String, String> getProperties() {
         return properties;
     }
 
+    /**
+     * Sets properties.
+     *
+     * @param properties the properties
+     */
     public void setProperties(Map<String, String> properties) {
         this.properties = properties;
     }

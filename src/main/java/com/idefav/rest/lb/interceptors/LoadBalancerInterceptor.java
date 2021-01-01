@@ -32,31 +32,52 @@ public class LoadBalancerInterceptor implements ClientHttpRequestInterceptor {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(LoadBalancerInterceptor.class);
 
-    private static Map<String, LoadBalancer> serviceLoadBancorList = new HashMap<>();
+    private final static Object lock = new Object();
+
+    private static final Map<String, LoadBalancer> serviceLoadBancorList = new HashMap<>();
+
     private Map<String, ServiceConfig> serviceList = new HashMap<>();
 
 
+    /**
+     * Instantiates a new Load balancer interceptor.
+     *
+     * @param serviceList the service list
+     */
     public LoadBalancerInterceptor(Map<String, ServiceConfig> serviceList) {
         this.serviceList = serviceList;
     }
 
-    public LoadBalancer getLoadbanlencer(String serviceId) {
+    /**
+     * Gets loadbalancer.
+     *
+     * @param serviceId the service id
+     * @return the loadbalancer
+     */
+    public LoadBalancer getLoadbalancer(String serviceId) {
         if (serviceLoadBancorList.containsKey(serviceId)) {
             return serviceLoadBancorList.get(serviceId);
         }
-        ServiceConfig serviceConfig = serviceList.get(serviceId);
-        LoadBalancer newInstance = new RandomLoadBalaner(serviceList.get(serviceId).getServerList());
-        try {
-            Constructor<?> constructor = serviceConfig.getLoadBalancor().getConstructor(List.class);
-            newInstance = (LoadBalancer) constructor.newInstance(serviceConfig.getServerList());
+        synchronized (lock) {
+            if (serviceLoadBancorList.containsKey(serviceId)) {
+                return serviceLoadBancorList.get(serviceId);
+            }
+            ServiceConfig serviceConfig = serviceList.get(serviceId);
+            LoadBalancer newInstance;
+            try {
+                Constructor<?> constructor = serviceConfig.getLoadBalancor().getConstructor(List.class);
+                newInstance = (LoadBalancer) constructor.newInstance(serviceConfig.getServerList());
+                serviceLoadBancorList.put(serviceId, newInstance);
+                return newInstance;
+            } catch (Exception e) {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("create loadbalancer instance failed, " + ExceptionUtils.getMessage(e));
+                }
+                newInstance = new RandomLoadBalaner(serviceList.get(serviceId).getServerList());
+            }
             serviceLoadBancorList.put(serviceId, newInstance);
             return newInstance;
-        } catch (Exception e) {
-            e.printStackTrace();
         }
-        serviceLoadBancorList.put(serviceId, newInstance);
-        return newInstance;
-
     }
 
     @Override
@@ -64,9 +85,17 @@ public class LoadBalancerInterceptor implements ClientHttpRequestInterceptor {
         return clientHttpRequestExecution.execute(new LoadBalancerHttpReqeustWrapper(httpRequest), bytes);
     }
 
+    /**
+     * The type Load balancer http reqeust wrapper.
+     */
     public class LoadBalancerHttpReqeustWrapper extends HttpRequestWrapper {
 
 
+        /**
+         * Instantiates a new Load balancer http reqeust wrapper.
+         *
+         * @param request the request
+         */
         public LoadBalancerHttpReqeustWrapper(HttpRequest request) {
             super(request);
         }
@@ -76,7 +105,7 @@ public class LoadBalancerInterceptor implements ClientHttpRequestInterceptor {
         public URI getURI() {
             URI oldUri = super.getURI();
             String serviceId = oldUri.getHost();
-            LoadBalancer loadBancor = getLoadbanlencer(serviceId);
+            LoadBalancer loadBancor = getLoadbalancer(serviceId);
             LbServer server = loadBancor.getServer();
             try {
                 return RestUtil.replaceHost(oldUri, server.getUrl());

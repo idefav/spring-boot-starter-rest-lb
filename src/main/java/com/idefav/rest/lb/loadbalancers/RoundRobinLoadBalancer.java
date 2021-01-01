@@ -15,6 +15,11 @@ public class RoundRobinLoadBalancer extends AbstractLoadBalancer {
 
     private AtomicInteger index = new AtomicInteger(0);
 
+    /**
+     * Instantiates a new Round robin load balancer.
+     *
+     * @param serverList the server list
+     */
     public RoundRobinLoadBalancer(List<LbServer> serverList) {
         super(serverList);
     }

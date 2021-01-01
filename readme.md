@@ -2,6 +2,7 @@
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/22379/badge.svg)](https://scan.coverity.com/projects/idefav-spring-boot-starter-rest-lb)
 [![GitHub release](https://img.shields.io/github/release/idefav/spring-boot-starter-rest-lb.svg)](https://github.com/idefav/spring-boot-starter-rest-lb/releases)
 [![Maven Central Repo](https://img.shields.io/maven-central/v/com.idefav.rest.lb/spring-boot-starter-rest-lb.svg)](https://mvnrepository.com/artifact/com.idefav.rest.lb/spring-boot-starter-rest-lb)
+[![Coverage Status](https://coveralls.io/repos/github/idefav/spring-boot-starter-rest-lb/badge.svg?branch=master)](https://coveralls.io/github/idefav/spring-boot-starter-rest-lb?branch=master)
 ![](https://img.shields.io/badge/JAVA-1.8+-green.svg)
 ![](https://img.shields.io/badge/MAVEN-3.5+-pink.svg)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)

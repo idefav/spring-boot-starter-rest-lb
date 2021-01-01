@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.idefav.rest.lb.configuration.RestLbAutoConfiguration

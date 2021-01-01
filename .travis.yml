@@ -21,7 +21,7 @@ branches:
 
 env:
   global:
-    - secure: "txoYuciBo6e1YouMPYrgHOttqF3qGeBMTLQhyyFrSjABANcT+ce4M3v7n4gVzNfwEpGFWXNyNIrgVpTifS3psF/K2tnAvQ0iba6+NYP86fG6jv4a2mnZ2Rr8q3uHufydRnt3XLyK/SllbuHaffoiCIxbmnOWX0cbNZ8rUs+4EVQmt3zXKbiDtRIy07aVKKx0YU5/20GgfQ/yZJNaDEWN7alEcdCjXTRJKMe6pfb6bmRtrYfzVfMUKj0kNPqPTY94XVHVvw0E+Yk+7kY9SDnuzvBIDNxELm2ez9umqdxin+UX3a9pA0nrNvjJHnVsQ98xsEmrJojS9/65H63WnhXGafyuWwtJAnbabeDIPVuQmQVI5kibJu91IxyTy6VC1q/N9mWUA7P57cnQgXIyXA2kGrbu0MYzHKfI6Pj0oj8PwOUPRWMS4tmT3FW8ep08cDYZXHo+6lbHtomfqpW5eyXF4DAB1gHsEncEFzUBE2TAGygfdXC0tf8r0mxo2ikjjxBwhBbeGWxmtKCuMU67V8mKwxa2JZ9JTbOrDBwlJdkGU4gaazbA2VZN9lITlTxc5M96Hpx+KrqGbBtfVWad5jdLV/XX9mMQbYuajpE/mscH30uaWPJlE+RbIXkdTul1aczj8ENf9aaLSsK1rgy6L3125K0WcGHcrTSA8iAPFAj8Img="
+    - secure: "hBtssC21H39GYQfZJF70QGIOGOeb6vNehswEzTWRUrvgbz2nRyuqlb4X6jBA7Q4vPiALitW3zpBw4UbvuXyc8w+HPmNDq1uMl0Zha7lVpYjcJeqSptZrolwdiQrEZdl17RlW2ljCf9Ub4Zsvo3Yhad4pWZGiOn9btbrTn/gUGK/xQsDhJURF+Vt1pYUK7WzEt7cf6wO9YcvueXQcBImkcwHYzl1mAtsie5Tz4zGYEBUYtcddUMAWZrlrDyv8UcQvgXlTanLCP6+wHPbIrqjCnYfG9Y4gRheNI3uq/gHGS5SIdWxXq2QstGMNj9rBa/PyjzpPp2OiDPVyVs+/5B3M9ta10eiNrWhVPqJdOj4fWjBfiXqSaEoaAVh3yEE2i2Ixbut3E0JG3PSAOnsZhujSXwZWVb2Pm07C0z+G5NxOCqTUopl2fCFNCjAhBCQtLpACQp4aphGoTPyCGViMr9hXqvihxtG0meWsLEplQJ2diE0Xw+6OENjgQm1HhWITv2JEDUxExL/wd1WLmZb3M62xDmh8WCxjEyWgodHpnr/zwqdOVq4/7rRewrZMaZuLXtyAa/Nd54snrjQ+xk1PN9IQs/zQJHDwanHANJtrGqtr3XVl2oNvpIE8++U+J8YEFIFNnqDnUa753XXyTgts7yRN808B/r4hD4JdJeG+Iw7gTo0="
     - "MAVEN_OPTS=-Xms1024m -Xmx3072m -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=384m"
 before_install:
   - echo -n | openssl s_client -connect https://scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
@@ -31,7 +31,7 @@ addons:
     project:
       name: "idefav/spring-boot-starter-rest-lb"
       description: "Build submitted via Travis CI"
-    notification_email: wzs2009_hi@126.com
+    notification_email: "wzs2009_hi@126.com"
     build_command_prepend: "mvn clean"
     build_command: "mvn -DskipTests=true compile"
     branch_pattern: master

@@ -86,6 +86,5 @@ public class RandomWithWeightLoadBalancer extends AbstractLoadBalancer {
         return weightMap.get(doubleLbServerNavigableMap.firstKey());
     }
 }
-
 ```
 

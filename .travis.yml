@@ -8,6 +8,9 @@ notification:
     on_success: always
     on_failure: always
 
+before_install:
+  - pip install --user codecov
+
 after_success:
   - mvn clean test jacoco:report coveralls:report
   - codecov

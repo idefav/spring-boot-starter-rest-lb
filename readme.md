@@ -1,4 +1,5 @@
 ![Java CI with Maven](https://github.com/idefav/spring-boot-starter-rest-lb/workflows/Java%20CI%20with%20Maven/badge.svg)
+![Publish package to the Maven Central Repository](https://github.com/idefav/spring-boot-starter-rest-lb/workflows/Publish%20package%20to%20the%20Maven%20Central%20Repository/badge.svg)
 # RestTemplate 的负载均衡实现
 ## 优点
 1. 基于 `Spring Boot` 的 `Starter` 启动器, 开箱即用

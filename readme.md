@@ -1,6 +1,5 @@
 ![Java CI with Maven](https://github.com/idefav/spring-boot-starter-rest-lb/workflows/Java%20CI%20with%20Maven/badge.svg)
 [![GitHub release](https://img.shields.io/github/release/idefav/spring-boot-starter-rest-lb.svg)](https://github.com/idefav/spring-boot-starter-rest-lb/releases)
-![Publish package to the Maven Central Repository](https://github.com/idefav/spring-boot-starter-rest-lb/workflows/Publish%20package%20to%20the%20Maven%20Central%20Repository/badge.svg)
 [![Maven Central Repo](https://img.shields.io/maven-central/v/com.idefav.rest.lb/spring-boot-starter-rest-lb.svg)](https://mvnrepository.com/artifact/com.idefav.rest.lb/spring-boot-starter-rest-lb)
 ![](https://img.shields.io/badge/JAVA-1.8+-green.svg)
 ![](https://img.shields.io/badge/MAVEN-3.5+-pink.svg)

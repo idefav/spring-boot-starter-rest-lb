@@ -1,0 +1,36 @@
+language: java
+jdk:
+  - oraclejdk8
+notification:
+  email:
+    recipients:
+      - wzs2009_hi@126.com
+    on_success: always
+    on_failure: always
+
+after_success:
+  - mvn clean test jacoco:report coveralls:report
+  - codecov
+
+branches:
+  only:
+    - master
+
+env:
+  global:
+    - secure: "iKl6dYhzDRYC1KEhr6X_1Q"
+    - "MAVEN_OPTS=-Xms1024m -Xmx3072m -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=384m"
+
+addons:
+  coverity_scan:
+    project:
+      name: "idefav/spring-boot-starter-rest-lb"
+      description: "Build submitted via Travis CI"
+    notification_email: wzs2009_hi@126.com
+    build_command_prepend: "mvn clean"
+    build_command: "mvn -DskipTests=true compile"
+    branch_pattern: master
+
+cache:
+  directories:
+    - $HOME/.m2

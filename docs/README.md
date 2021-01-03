@@ -10,7 +10,7 @@
 1. 基于 `Spring Boot` 的 `Starter` 启动器, 开箱即用
 2. 依赖包较少
 3. 配置简单, 增强 `RestTemplate` 实现负载均衡
-4. 扩展简单, 默认实现有 轮询 和 随机 负载规则算法, 支持自定义负载规则
+4. 扩展简单, 默认实现有 轮询 、 随机以及权重随机等 负载规则算法, 支持自定义负载规则
 5. 使用 Spring Boot 原生配置, 支持 `Spring Cloud Config/Apollo/Nacos` 等配置中心
 ## 适用场景
 1. 不想使用 `Spring Cloud`、`Dubbo` 等, 大型微服务框架

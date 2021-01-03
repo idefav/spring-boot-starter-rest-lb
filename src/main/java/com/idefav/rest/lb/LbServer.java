@@ -15,6 +15,11 @@ public class LbServer {
     private String url;
 
     /**
+     * 权重, 只有在权重随机算法中有效
+     */
+    private Integer weight;
+
+    /**
      * 附加属性
      */
     private Map<String, String> properties;
@@ -53,5 +58,23 @@ public class LbServer {
      */
     public void setProperties(Map<String, String> properties) {
         this.properties = properties;
+    }
+
+    /**
+     * Gets weight.
+     *
+     * @return the weight
+     */
+    public Integer getWeight() {
+        return weight;
+    }
+
+    /**
+     * Sets weight.
+     *
+     * @param weight the weight
+     */
+    public void setWeight(Integer weight) {
+        this.weight = weight;
     }
 }

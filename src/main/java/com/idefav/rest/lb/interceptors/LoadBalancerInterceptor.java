@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * the UrlOverriderInterceptor description.
+ * the LoadBalancerInterceptor description.
  *
  * @author wuzishu
  */
@@ -82,7 +82,8 @@ public class LoadBalancerInterceptor implements ClientHttpRequestInterceptor {
 
     @Override
     public ClientHttpResponse intercept(HttpRequest httpRequest, byte[] bytes, ClientHttpRequestExecution clientHttpRequestExecution) throws IOException {
-        return clientHttpRequestExecution.execute(new LoadBalancerHttpReqeustWrapper(httpRequest), bytes);
+        LoadBalancerHttpReqeustWrapper reqeustWrapper = new LoadBalancerHttpReqeustWrapper(httpRequest);
+        return clientHttpRequestExecution.execute(reqeustWrapper, bytes);
     }
 
     /**
@@ -90,6 +91,16 @@ public class LoadBalancerInterceptor implements ClientHttpRequestInterceptor {
      */
     public class LoadBalancerHttpReqeustWrapper extends HttpRequestWrapper {
 
+        private LbServer choosedServer = null;
+
+        /**
+         * Gets choosed server.
+         *
+         * @return the choosed server
+         */
+        public LbServer getChoosedServer() {
+            return choosedServer;
+        }
 
         /**
          * Instantiates a new Load balancer http reqeust wrapper.
@@ -107,6 +118,7 @@ public class LoadBalancerInterceptor implements ClientHttpRequestInterceptor {
             String serviceId = oldUri.getHost();
             LoadBalancer loadBancor = getLoadbalancer(serviceId);
             LbServer server = loadBancor.getServer();
+            choosedServer = server;
             try {
                 return RestUtil.replaceHost(oldUri, server.getUrl());
             } catch (URISyntaxException e) {

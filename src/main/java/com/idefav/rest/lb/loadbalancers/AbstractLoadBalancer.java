@@ -5,7 +5,7 @@ import com.idefav.rest.lb.LbServer;
 import java.util.List;
 
 /**
- * Abstract LoadBanlener
+ * Abstract LoadBalaner
  *
  * @author wuzishu
  */
@@ -20,7 +20,7 @@ public abstract class AbstractLoadBalancer implements LoadBalancer {
         this.serverList = serverList;
     }
 
-    private List<LbServer> serverList;
+    private final List<LbServer> serverList;
 
     /**
      * Gets server list.

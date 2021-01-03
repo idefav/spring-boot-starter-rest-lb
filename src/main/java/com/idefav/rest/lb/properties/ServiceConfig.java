@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * the ServiceConfig description.
  *
- * @author $ {USER}
+ * @author wuzishu
  */
 public class ServiceConfig {
 

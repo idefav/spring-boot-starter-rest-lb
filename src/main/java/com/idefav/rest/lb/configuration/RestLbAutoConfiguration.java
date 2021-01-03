@@ -18,7 +18,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * RestTemplate LoadBanlencer 自动配置
+ * RestTemplate LoadBalancer 自动配置
  *
  * @author wuzishu
  */

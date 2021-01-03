@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * the RandomLoadBancor description.
+ * the RandomLoadBalancer description.
  *
  * @author wuzishu
  */

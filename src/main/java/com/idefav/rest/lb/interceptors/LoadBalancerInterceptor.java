@@ -3,9 +3,10 @@ package com.idefav.rest.lb.interceptors;
 
 import com.idefav.rest.lb.LbServer;
 import com.idefav.rest.lb.RestUtil;
+import com.idefav.rest.lb.ServiceConfig;
 import com.idefav.rest.lb.loadbalancers.LoadBalancer;
 import com.idefav.rest.lb.loadbalancers.RandomLoadBalaner;
-import com.idefav.rest.lb.properties.ServiceConfig;
+import com.idefav.rest.lb.properties.ServiceProperty;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +15,11 @@ import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.support.HttpRequestWrapper;
+import org.springframework.retry.RecoveryCallback;
+import org.springframework.retry.RetryCallback;
+import org.springframework.retry.RetryContext;
+import org.springframework.retry.RetryState;
+import org.springframework.retry.support.RetryTemplate;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -38,6 +44,12 @@ public class LoadBalancerInterceptor implements ClientHttpRequestInterceptor {
 
     private Map<String, ServiceConfig> serviceList = new HashMap<>();
 
+    private RetryTemplate retryTemplate = null;
+
+    public LoadBalancerInterceptor(Map<String, ServiceConfig> serviceList, RetryTemplate retryTemplate) {
+        this.serviceList = serviceList;
+        this.retryTemplate = retryTemplate;
+    }
 
     /**
      * Instantiates a new Load balancer interceptor.
@@ -83,7 +95,39 @@ public class LoadBalancerInterceptor implements ClientHttpRequestInterceptor {
     @Override
     public ClientHttpResponse intercept(HttpRequest httpRequest, byte[] bytes, ClientHttpRequestExecution clientHttpRequestExecution) throws IOException {
         LoadBalancerHttpReqeustWrapper reqeustWrapper = new LoadBalancerHttpReqeustWrapper(httpRequest);
-        return clientHttpRequestExecution.execute(reqeustWrapper, bytes);
+        if (retryTemplate == null) {
+            return clientHttpRequestExecution.execute(reqeustWrapper, bytes);
+        }
+        try {
+            return retryTemplate.execute(new RetryCallback<ClientHttpResponse, Throwable>() {
+                @Override
+                public ClientHttpResponse doWithRetry(RetryContext context) throws Throwable {
+                    return clientHttpRequestExecution.execute(reqeustWrapper, bytes);
+                }
+            }, new RecoveryCallback<ClientHttpResponse>() {
+                @Override
+                public ClientHttpResponse recover(RetryContext context) throws Exception {
+                    return null;
+                }
+            }, new RetryState() {
+                @Override
+                public ClientHttpResponse getKey() {
+                    return null;
+                }
+
+                @Override
+                public boolean isForceRefresh() {
+                    return false;
+                }
+
+                @Override
+                public boolean rollbackFor(Throwable exception) {
+                    return false;
+                }
+            });
+        } catch (Throwable throwable) {
+            throw new RuntimeException(throwable);
+        }
     }
 
     /**

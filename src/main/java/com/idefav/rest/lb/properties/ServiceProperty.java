@@ -11,12 +11,12 @@ import java.util.List;
  *
  * @author wuzishu
  */
-public class ServiceConfig {
+public class ServiceProperty {
 
     /**
      * 服务列表
      */
-    private List<LbServer> serverList;
+    private List<LbServerProperty> serverList;
 
     /**
      * 负责均衡器 默认: 随机负载
@@ -28,7 +28,7 @@ public class ServiceConfig {
      *
      * @return the server list
      */
-    public List<LbServer> getServerList() {
+    public List<LbServerProperty> getServerList() {
         return serverList;
     }
 
@@ -37,7 +37,7 @@ public class ServiceConfig {
      *
      * @param serverList the server list
      */
-    public void setServerList(List<LbServer> serverList) {
+    public void setServerList(List<LbServerProperty> serverList) {
         this.serverList = serverList;
     }
 

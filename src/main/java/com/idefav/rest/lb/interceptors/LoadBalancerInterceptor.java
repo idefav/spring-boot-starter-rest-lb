@@ -6,11 +6,14 @@ import com.idefav.rest.lb.RestUtil;
 import com.idefav.rest.lb.ServiceConfig;
 import com.idefav.rest.lb.loadbalancers.LoadBalancer;
 import com.idefav.rest.lb.loadbalancers.RandomLoadBalaner;
-import com.idefav.rest.lb.properties.ServiceProperty;
+import com.idefav.rest.lb.properties.RetryProperty;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
@@ -18,13 +21,13 @@ import org.springframework.http.client.support.HttpRequestWrapper;
 import org.springframework.retry.RecoveryCallback;
 import org.springframework.retry.RetryCallback;
 import org.springframework.retry.RetryContext;
-import org.springframework.retry.RetryState;
 import org.springframework.retry.support.RetryTemplate;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,14 +45,33 @@ public class LoadBalancerInterceptor implements ClientHttpRequestInterceptor {
 
     private static final Map<String, LoadBalancer> serviceLoadBancorList = new HashMap<>();
 
+    /**
+     * The constant RETRY_CONTEXT_ATTRIBUTE_REQUEST.
+     */
+    public static final String RETRY_CONTEXT_ATTRIBUTE_REQUEST = "request";
+    /**
+     * The constant RETRY_CONTEXT_ATTRIBUTE_BODY.
+     */
+    public static final String RETRY_CONTEXT_ATTRIBUTE_BODY = "body";
+    /**
+     * The constant RETRY_CONTEXT_ATTRIBUTE_EXECUTION.
+     */
+    public static final String RETRY_CONTEXT_ATTRIBUTE_EXECUTION = "clientHttpRequestExecution";
+    /**
+     * The constant RETRY_CONTEXT_ATTRIBUTE_SERVICECONFIG.
+     */
+    public static final String RETRY_CONTEXT_ATTRIBUTE_SERVICECONFIG = "serviceConfig";
+    /**
+     * The constant RETRY_CONTEXT_ATTRIBUTE_SERVICELIST.
+     */
+    public static final String RETRY_CONTEXT_ATTRIBUTE_SERVICELIST = "serviceList";
+    /**
+     * The constant RETRY_CONTEXT_ATTRIBUTE_SERVICEID.
+     */
+    public static final String RETRY_CONTEXT_ATTRIBUTE_SERVICEID = "serviceId";
+    public static final String RETRY_CONTEXT_ATTRIBUTE_RESPONSE = "response";
+
     private Map<String, ServiceConfig> serviceList = new HashMap<>();
-
-    private RetryTemplate retryTemplate = null;
-
-    public LoadBalancerInterceptor(Map<String, ServiceConfig> serviceList, RetryTemplate retryTemplate) {
-        this.serviceList = serviceList;
-        this.retryTemplate = retryTemplate;
-    }
 
     /**
      * Instantiates a new Load balancer interceptor.
@@ -92,42 +114,72 @@ public class LoadBalancerInterceptor implements ClientHttpRequestInterceptor {
         }
     }
 
+    /**
+     * Gets retry template.
+     *
+     * @param serviceId the service id
+     * @return the retry template
+     */
+    public RetryTemplate getRetryTemplate(String serviceId) {
+        ServiceConfig serviceConfig = serviceList.get(serviceId);
+        if (serviceConfig != null)
+            return serviceConfig.getRetryTemplate();
+        return null;
+    }
+
+    /**
+     * Gets recovery callback.
+     *
+     * @param serviceId the service id
+     * @return the recovery callback
+     */
+    public RecoveryCallback<ClientHttpResponse> getRecoveryCallback(String serviceId) {
+        ServiceConfig serviceConfig = serviceList.get(serviceId);
+        if (serviceConfig != null)
+            return serviceConfig.getRecoveryCallback();
+        return null;
+    }
+
     @Override
     public ClientHttpResponse intercept(HttpRequest httpRequest, byte[] bytes, ClientHttpRequestExecution clientHttpRequestExecution) throws IOException {
         LoadBalancerHttpReqeustWrapper reqeustWrapper = new LoadBalancerHttpReqeustWrapper(httpRequest);
+        RetryTemplate retryTemplate = getRetryTemplate(reqeustWrapper.getServiceId());
         if (retryTemplate == null) {
             return clientHttpRequestExecution.execute(reqeustWrapper, bytes);
         }
         try {
-            return retryTemplate.execute(new RetryCallback<ClientHttpResponse, Throwable>() {
-                @Override
-                public ClientHttpResponse doWithRetry(RetryContext context) throws Throwable {
-                    return clientHttpRequestExecution.execute(reqeustWrapper, bytes);
-                }
-            }, new RecoveryCallback<ClientHttpResponse>() {
-                @Override
-                public ClientHttpResponse recover(RetryContext context) throws Exception {
-                    return null;
-                }
-            }, new RetryState() {
-                @Override
-                public ClientHttpResponse getKey() {
-                    return null;
-                }
+            if (getRecoveryCallback(reqeustWrapper.getServiceId()) != null) {
+                return retryTemplate.execute((RetryCallback<ClientHttpResponse, Throwable>) context -> proc(context, reqeustWrapper, bytes, clientHttpRequestExecution), getRecoveryCallback(reqeustWrapper.getServiceId()));
+            } else {
+                return retryTemplate.execute((RetryCallback<ClientHttpResponse, Throwable>) context -> proc(context, reqeustWrapper, bytes, clientHttpRequestExecution));
+            }
 
-                @Override
-                public boolean isForceRefresh() {
-                    return false;
-                }
-
-                @Override
-                public boolean rollbackFor(Throwable exception) {
-                    return false;
-                }
-            });
         } catch (Throwable throwable) {
             throw new RuntimeException(throwable);
         }
+    }
+
+    private ClientHttpResponse proc(RetryContext context, LoadBalancerHttpReqeustWrapper reqeustWrapper, byte[] bytes, ClientHttpRequestExecution clientHttpRequestExecution) throws IOException {
+        context.setAttribute(RETRY_CONTEXT_ATTRIBUTE_REQUEST, reqeustWrapper);
+        context.setAttribute(RETRY_CONTEXT_ATTRIBUTE_BODY, bytes);
+        context.setAttribute(RETRY_CONTEXT_ATTRIBUTE_EXECUTION, clientHttpRequestExecution);
+        context.setAttribute(RETRY_CONTEXT_ATTRIBUTE_SERVICELIST, serviceList);
+        context.setAttribute(RETRY_CONTEXT_ATTRIBUTE_SERVICEID, reqeustWrapper.getServiceId());
+        ServiceConfig serviceConfig = serviceList.get(reqeustWrapper.getServiceId());
+        context.setAttribute(RETRY_CONTEXT_ATTRIBUTE_SERVICECONFIG, serviceConfig);
+        ClientHttpResponse execute = clientHttpRequestExecution.execute(reqeustWrapper, bytes);
+        context.setAttribute(RETRY_CONTEXT_ATTRIBUTE_RESPONSE, execute);
+        if (serviceConfig.getCondition() == null) {
+            return execute;
+        }
+        List<HttpStatus> needRetryStatusCodes = Arrays.asList(serviceConfig.getCondition().getNeedRetryStatusCodes());
+        List<HttpMethod> needRetryHttpMethods = Arrays.asList(serviceConfig.getCondition().getNeedRetryHttpMethods());
+        if (needRetryHttpMethods.contains(reqeustWrapper.getMethod()) && needRetryStatusCodes.contains(execute.getStatusCode())) {
+            throw new RuntimeException("request failed with error status code:" + execute.getStatusCode().value());
+        } else {
+            return execute;
+        }
+
     }
 
     /**
@@ -137,6 +189,8 @@ public class LoadBalancerInterceptor implements ClientHttpRequestInterceptor {
 
         private LbServer choosedServer = null;
 
+        private String serviceId = StringUtils.EMPTY;
+
         /**
          * Gets choosed server.
          *
@@ -144,6 +198,19 @@ public class LoadBalancerInterceptor implements ClientHttpRequestInterceptor {
          */
         public LbServer getChoosedServer() {
             return choosedServer;
+        }
+
+        /**
+         * Gets service id.
+         *
+         * @return the service id
+         */
+        public String getServiceId() {
+            if (StringUtils.isEmpty(this.serviceId)) {
+                URI oldUri = super.getURI();
+                this.serviceId = oldUri.getHost();
+            }
+            return serviceId;
         }
 
         /**
@@ -159,8 +226,8 @@ public class LoadBalancerInterceptor implements ClientHttpRequestInterceptor {
         @Override
         public URI getURI() {
             URI oldUri = super.getURI();
-            String serviceId = oldUri.getHost();
-            LoadBalancer loadBancor = getLoadbalancer(serviceId);
+            this.serviceId = oldUri.getHost();
+            LoadBalancer loadBancor = getLoadbalancer(this.serviceId);
             LbServer server = loadBancor.getServer();
             choosedServer = server;
             try {

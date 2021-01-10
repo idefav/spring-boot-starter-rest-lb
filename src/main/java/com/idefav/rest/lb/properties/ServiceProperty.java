@@ -1,7 +1,6 @@
 package com.idefav.rest.lb.properties;
 
 
-import com.idefav.rest.lb.LbServer;
 import com.idefav.rest.lb.loadbalancers.RandomLoadBalaner;
 
 import java.util.List;
@@ -22,6 +21,11 @@ public class ServiceProperty {
      * 负责均衡器 默认: 随机负载
      */
     private Class<?> loadBalancor = RandomLoadBalaner.class;
+
+    /**
+     * 重试属性
+     */
+    private RetryProperty retryProperty;
 
     /**
      * Gets server list.
@@ -57,5 +61,23 @@ public class ServiceProperty {
      */
     public void setLoadBalancor(Class<?> loadBalancor) {
         this.loadBalancor = loadBalancor;
+    }
+
+    /**
+     * Gets retry property.
+     *
+     * @return the retry property
+     */
+    public RetryProperty getRetryProperty() {
+        return retryProperty;
+    }
+
+    /**
+     * Sets retry property.
+     *
+     * @param retryProperty the retry property
+     */
+    public void setRetryProperty(RetryProperty retryProperty) {
+        this.retryProperty = retryProperty;
     }
 }

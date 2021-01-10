@@ -94,4 +94,21 @@ public class RandomWithWeightLoadBalancer extends AbstractLoadBalancer {
     }
 }
 ```
-
+## 重试
+1. 固定次数重试
+```properties
+idefav.service-list.httpbin.retry-property.enable=true
+idefav.service-list.httpbin.retry-property.retry.max-attempts=3
+ ```
+遇到调用接口失败, 会自动重试3次
+2. 设定重试最大超时时间
+```properties
+idefav.service-list.httpbin.retry-property.retry.timeout=20000
+```
+在最大重试时间之内, 会一直重试
+如果设置了固定次数重试, 即使最大重试次数未达到, 如果达到最大重试时间, 也终止重试
+3. 熔断降级
+```properties
+idefav.service-list.httpbin.retry-property.retry.open-timeout=5000
+idefav.service-list.httpbin.retry-property.retry.reset-timeout=20000
+```

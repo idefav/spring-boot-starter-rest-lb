@@ -1,6 +1,8 @@
 package com.idefav.rest.lb.loadbalancers;
 
 import com.idefav.rest.lb.LbServer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.NavigableMap;
@@ -12,7 +14,7 @@ import java.util.TreeMap;
  * @author wuzishu
  */
 public class RandomWithWeightLoadBalancer extends AbstractLoadBalancer {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(RandomWithWeightLoadBalancer.class);
     private TreeMap<Double, LbServer> weightMap = new TreeMap<>();
 
     /**
@@ -26,7 +28,9 @@ public class RandomWithWeightLoadBalancer extends AbstractLoadBalancer {
         serverList.forEach(k -> {
             double lastWeight = this.weightMap.size() == 0 ? 0 : this.weightMap.lastKey();
             Integer weight = k.getWeight();
+            LOGGER.debug("实例列表: {}, 权重: {}", k.getUrl(), k.getWeight());
             if (weight == null) {
+                LOGGER.warn("There are services without configured weights,{}", k);
                 return;
             }
             if (weight <= 0) {

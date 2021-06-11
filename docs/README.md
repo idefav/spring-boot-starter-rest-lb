@@ -55,7 +55,7 @@ idefav.service-list.baidu.server-list[1].url=www.jd.com
 ## 扩展
 使用字段 properties 新增 weight 权重字段
 ```properties
-idefav.service-list.baidu.load-balancor=com.idefav.springbootdemo.loadbalancers.RandomWithWeightLoadBalancer
+idefav.service-list.baidu.load-balancor=com.idefav.springbootdemo.loadbalancers.WeightedRandomLoadBalancer
 idefav.service-list.baidu.server-list[0].url=www.baidu.com
 idefav.service-list.baidu.server-list[0].properties.weight=20
 idefav.service-list.baidu.server-list[1].url=www.jd.com
@@ -63,26 +63,30 @@ idefav.service-list.baidu.server-list[1].properties.weight=80
 ```
 实现权重随机算法
 ```java
-public class RandomWithWeightLoadBalancer extends AbstractLoadBalancer {
-
+public class WeightedRandomLoadBalancer extends AbstractLoadBalancer {
+    private static final Logger LOGGER = LoggerFactory.getLogger(WeightedRandomLoadBalancer.class);
     private TreeMap<Double, LbServer> weightMap = new TreeMap<>();
 
-    public RandomWithWeightLoadBalancer(List<LbServer> serverList) {
+    /**
+     * Instantiates a new Random with weight load balancer.
+     *
+     * @param serverList the server list
+     */
+    public WeightedRandomLoadBalancer(List<LbServer> serverList) {
         super(serverList);
         checkServerList();
         serverList.forEach(k -> {
             double lastWeight = this.weightMap.size() == 0 ? 0 : this.weightMap.lastKey();
-            if (k.getProperties() == null) {
+            Integer weight = k.getWeight();
+            LOGGER.debug("实例列表: {}, 权重: {}", k.getUrl(), k.getWeight());
+            if (weight == null) {
+                LOGGER.warn("There are services without configured weights,{}", k);
                 return;
             }
-            String weight = k.getProperties().get("weight");
-            if (StringUtils.isEmpty(weight)) {
+            if (weight <= 0) {
                 return;
             }
-            if (!StringUtils.isNumeric(weight)) {
-                return;
-            }
-            weightMap.put(Double.parseDouble(weight) + lastWeight, k);
+            weightMap.put(weight + lastWeight, k);
         });
     }
 

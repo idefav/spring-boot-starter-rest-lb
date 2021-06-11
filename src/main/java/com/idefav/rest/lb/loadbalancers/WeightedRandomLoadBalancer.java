@@ -13,8 +13,8 @@ import java.util.TreeMap;
  *
  * @author wuzishu
  */
-public class RandomWithWeightLoadBalancer extends AbstractLoadBalancer {
-    private static final Logger LOGGER = LoggerFactory.getLogger(RandomWithWeightLoadBalancer.class);
+public class WeightedRandomLoadBalancer extends AbstractLoadBalancer {
+    private static final Logger LOGGER = LoggerFactory.getLogger(WeightedRandomLoadBalancer.class);
     private TreeMap<Double, LbServer> weightMap = new TreeMap<>();
 
     /**
@@ -22,7 +22,7 @@ public class RandomWithWeightLoadBalancer extends AbstractLoadBalancer {
      *
      * @param serverList the server list
      */
-    public RandomWithWeightLoadBalancer(List<LbServer> serverList) {
+    public WeightedRandomLoadBalancer(List<LbServer> serverList) {
         super(serverList);
         checkServerList();
         serverList.forEach(k -> {
